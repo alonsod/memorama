@@ -1,5 +1,5 @@
 
-const NUM_MAX_CARDS = 4
+const NUM_MAX_CARDS = 12
 const NUM_TUPLE     = 2 
 let shuffleNum = [];
 
