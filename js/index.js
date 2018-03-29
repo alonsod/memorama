@@ -1,7 +1,6 @@
 
 const NUM_MAX_CARDS = 12
 const NUM_TUPLE     = 2 
-let shuffleNum = [];
 
 const Cards = [[1,
    {
@@ -31,33 +30,96 @@ const Cards = [[1,
   }  ]
 ]
 
-let  randomNum = (min, max) => Math.round(Math.random() * (max - min) + min)
-
-function shuffle(){
-  shuffleNum = [];
-  for(var i=0; i<NUM_MAX_CARDS; i++) {
-      var num = randomNum(1,NUM_MAX_CARDS);
-      if(shuffleNum.indexOf(num) >= 0) {
-          i = i-1;
-      } else {
-          shuffleNum[i] = num;
-      }
+class Card {
+  constructor(id, sourceFront) {
+    
+    this.liCard = this.renderCard(id)
+    
+    this.back = this.liCard.querySelector(".card-back")
+    this.front = this.liCard.querySelector(".card-front")
+    this.sourceFront = sourceFront
+    
+    this.isBack = true
+    this.enabled = true
+  }  
+  
+  flip(){
+    if(this.enabled == true) {
+      this.front.src = this.sourceFront
+      this.back.classList.toggle("card-back-flip")
+      this.front.classList.toggle("card-front-flip")      
+      this.enabled = false
+      this.isBack = false
+      return true;
+    }
+    return false;
   }
+  
+  cover(){
+    this.enabled = true
+    this.isBack = true
+    this.back.classList.toggle("card-back-flip")
+    this.front.classList.toggle("card-front-flip")            
+    this.front.src = this.back.src
+  }
+  
+  say(say){
+    this.front.classList.toggle("card-front-" + say)
+  }
+  
+  renderCard(id) {
+    const src = "https://thumb1.shutterstock.com/display_pic_with_logo/2284001/524942290/stock-vector-cute-cats-seamless-pattern-524942290.jpg"
+    let cardBack = document.createElement('img')
+    cardBack.className = "card-back" 
+    cardBack.src = src
+
+    let cardFront = document.createElement('img')
+    cardFront.className = "card-front"
+    cardFront.src = src
+
+    let divCard = document.createElement('div')
+    divCard.className = "card"
+    divCard.appendChild(cardBack)
+    divCard.insertBefore(cardFront, cardBack)
+
+    let li = document.createElement('li')
+    li.id = "card" + id
+    li.className = "flex-item"
+    li.appendChild(divCard)  
+
+    return li
+  }  
 }
 
 class Game{  
-  constructor(onEndGame) {
+  constructor(onEndGame, elCanvas) {
     this.cards = new Map()
     this.cardsSelected = new Array()
     this.onEndGame = onEndGame.bind(this)
     this.numTuplesOK = 0
     this.numClicks = 0
     this.resultArray = ["ʘ‿ʘ Excelent!", "(´･_･`) Not bad", "¯\\_(ツ)_/¯ Bad "]
+    this.elCanvas = elCanvas
+    this.shuffleNum = [];
+  }
+  
+  init(){
+    let cardsMap = new Map(Cards);
+    this.shuffle()
+    this.cleanCanvas()
+    
+    for(let i=0; i<this.shuffleNum.length; i++){
+      let num = (this.shuffleNum[i] % (NUM_MAX_CARDS/NUM_TUPLE)) +1    
+      let card = cardsMap.get(num)
+      let cardg = new Card(i, card.source)
+      this.addCard(i, cardg)    
+    }    
   }
   
   addCard(id, card){
     card.liCard.addEventListener('click',  this.onClick.bind(this, card))
     this.cards.set(id, card)
+    this.elCanvas.appendChild(card.liCard)
   }
 
   onClick(card){          
@@ -133,92 +195,43 @@ class Game{
         
     this.onEndGame( this.resultArray[resultIndex], this.numClicks)
   }
-}
-
-class Card {
-  constructor(id, liCard, sourceFront) {
-    this.liCard = liCard
-    
-    this.back = liCard.querySelector(".card-back")
-    this.front = liCard.querySelector(".card-front")
-    this.sourceFront = sourceFront
-    
-    this.isBack = true
-    this.enabled = true
-  }  
   
-  flip(){
-    if(this.enabled == true) {
-      this.front.src = this.sourceFront
-      this.back.classList.toggle("card-back-flip")
-      this.front.classList.toggle("card-front-flip")      
-      this.enabled = false
-      this.isBack = false
-      return true;
+  cleanCanvas(){
+    while (this.elCanvas.firstChild) {
+      this.elCanvas.removeChild(this.elCanvas.firstChild);
+    }    
+  }
+  
+  randomNum(min, max) { return Math.round(Math.random() * (max - min) + min) }
+
+  shuffle(){
+    this.shuffleNum = [];
+    for(var i=0; i<NUM_MAX_CARDS; i++) {
+      var num = this.randomNum(1,NUM_MAX_CARDS);
+      console.log(num)
+      if(this.shuffleNum.indexOf(num) >= 0) {
+          i = i-1;
+      } else {
+            this.shuffleNum[i] = num;
+      }
     }
-    return false;
-  }
-  
-  cover(){
-    this.enabled = true
-    this.isBack = true
-    this.back.classList.toggle("card-back-flip")
-    this.front.classList.toggle("card-front-flip")            
-    this.front.src = this.back.src
-  }
-  
-  say(say){
-    this.front.classList.toggle("card-front-" + say)
-  }
+  }  
 }
 
-function renderCard(id, card) {
-  const src = "https://thumb1.shutterstock.com/display_pic_with_logo/2284001/524942290/stock-vector-cute-cats-seamless-pattern-524942290.jpg"
-  let cardBack = document.createElement('img')
-  cardBack.className = "card-back" 
-  cardBack.src = src
-  
-  let cardFront = document.createElement('img')
-  cardFront.className = "card-front"
-  cardFront.src = src
-  
-  let divCard = document.createElement('div')
-  divCard.className = "card"
-  divCard.appendChild(cardBack)
-  divCard.insertBefore(cardFront, cardBack)
-  
-  let li = document.createElement('li')
-  li.id = "card" + id
-  li.className = "flex-item"
-  li.appendChild(divCard)  
-    
-  return li
-}
 
 function startGame(){
-  let cardsMap = new Map(Cards);   
-  let game = new Game(endGame)
-  shuffle()
-  //Delete elements li
   let cards = document.getElementById("cards");
-  while (cards.firstChild) {
-    cards.removeChild(cards.firstChild);
-  }
-  // add elements li  
-  for(let i=0; i<shuffleNum.length; i++){
-    let num = (shuffleNum[i] % (NUM_MAX_CARDS/NUM_TUPLE)) +1
-    
-    card = cardsMap.get(num)
-    let cardx = renderCard(i, card)  
-    cards.appendChild(cardx)
-    
-    let cardg = new Card(i, cardx, card.source)
-    game.addCard(i, cardg)    
-  }
+  let game = new Game(endGame, cards)
+  game.init()
 }
 
 function playNow(){
   land.classList.toggle("land-hide");
+  startGame();
+}
+
+function playAgain(){
+  result.classList.toggle("land-hide");
   startGame();
 }
 
@@ -227,8 +240,4 @@ function endGame(resultGame, score){
   result.classList.toggle("land-hide");  
 }
 
-function playAgain(){
-  result.classList.toggle("land-hide");
-  startGame();
-}
 
