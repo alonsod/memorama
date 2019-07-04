@@ -6,7 +6,6 @@ Para el desarrollo se emplo JS (vanilla), CSS y HTML. Procure no usar funcional,
 
 Para ejecutarlo en modo local, solo tienes que descargar la carpeta y abrir el archivo index.html
 
-Reference-style: 
 ![alt text][img-memo]
 
 [img-memo]: https://github.com/alonsod/memorama/blob/master/captura-memo.PNG "memorama"
