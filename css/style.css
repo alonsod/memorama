@@ -167,21 +167,23 @@
     transform: rotateY(0deg);
 }
 
-.card-front {    
-    -webkit-transform: rotateY(180deg);
-            transform: rotateY(180deg);
-}
-
 .card-back-flip 
 {
-    -webkit-transform: rotateY(-180deg);
-            transform: rotateY(-180deg);
+    -webkit-transform: rotateY(270deg);
+            transform: rotateY(270deg);
+    scale(-1, 1)
+}
+
+.card-front {    
+    -webkit-transform: rotateY(-270deg);
+            transform: rotateY(-270deg);
 }
 
 .card-front-flip
 {
     -webkit-transform: rotateY(0deg);
             transform: rotateY(0deg);
+    scale(-1, 1)
 }
 
 .card-front-no
